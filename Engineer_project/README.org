@@ -1,0 +1,29 @@
+* Cel projektu
+Celem projektu było stworzenie Master'a oraz co najmniej dwóch Slave'ów.
+
+** Slave
+Zadaniem każdego ze slave'ów był pomiar temperatury z trzech czujników temperatur oraz wysłanie otrzymanych wyników do Master'a przy wykorzystaniu transmisji bezprzewodowej (WiFi).
+
+** Master
+Zadaniem mastera było przyjmowanie wyników otrzymanych od Slave'ów oraz prawidłowe ich wyświetlenie na konsoli komputera.
+
+|---------------+---------------|
+| 1 czujnik     | 1 czujnik     |
+| od 1. slave'a | od 2. slave'a |
+|---------------+---------------|
+| 2 czujnik     | 2 czujnik     |
+| od 1. slave'a | od 2. slave'a |
+|---------------+---------------|
+| 3 czujnik     | 3 czujnik     |
+| od 1. slave'a | od 2. slave'a |
+|---------------+---------------|
+
+* Wykonanie
+Do sterowania Slava'mi wykorzystano µC Atmega8l, a do sterowania Master'em wykorzystano µC Atmega128.
+
+** Slave (./ESP_client)
+Slave'y wysyłały informacje do Master'a przy wykorzystaniu modułów ESP-01. Moduły te były sterowane przy wykorzystaniu komend AT. µC komunikował się z modułem ESP-01 przy wykorzystaniu UART.
+
+** Master (./ESP_AP)
+Master odbierał dane od Slava'ów również przy wykorzystaniu modułu ESP-01, który również był sterowany przy wykorzystaniu komend AT. Komunikacja między µC, a modułem WiFi odbywała się przy wykorzystaniu UART.
+Po otrzymaniu danych, Master wysyłał je do komputera w celu wyświetlenia na konsoli również przy wykorzystaniu UART'a.

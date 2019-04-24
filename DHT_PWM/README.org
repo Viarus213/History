@@ -1,0 +1,12 @@
+* Cel projektu
+Celem projektu było stworzenie urządzenia, które miało za zadanie pomiar temperatury oraz odpowiednie sterowanie urządzeniami grzewczymi/chłodzącymi w celu zapewnienia zachowania odpowiedniej temperatury otoczenia. Dodatkowo wykonywane był pomiar wilgotności. Wyniki były prezentowane na wyświetlaczu LCD.
+
+* Pomiar temperatury i wilgotności
+Do pomiaru temperatury i wilgotności został wykorzystany czujnik DHT11 (./dht).
+Pierwotnie, zamierzano użyć czujnika DHT22, jednak z powodu wadliwych sztuk oraz braku czasu zdecydowano się na czujniki DHT11.
+
+* Wyświetlanie wyników
+Do wyświetlania wyników wykorzystano wyświetlacz LCD oparty o sterownik HD44780 (./LCD)
+
+* Sterowanie ogrzewaniem/chłodzeniem
+W celu pokazania jak powinny zachowywać się urządzenia grzewcze/chłodzące wykorzystano diodę RGB, która była sterowana za pomocą PWM'a - zależnie jak bardzo należało ogrzać/ochłodzić otoczenia tak mocno dioda świeciła na odpowiedni kolor (./PWM).

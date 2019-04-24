@@ -1,0 +1,20 @@
+* Cel projektu
+Projekt prostego mikroprocesora na płytce SPARTAN3 Xilinx'a
+Zadaniem układu było wykonywanie obliczeń na danych oraz wyświetlanie wyników.
+
+* Praca urządzenia
+Mikroprocesor mógł pracować w dwóch trybach:
+
+** Tryb 1
+Dane wraz z kodami operacji jakie mają zostać wykonane są pobierane ze stworzonej pamięci.
+
+** Tryb 2
+Dane pobierane są od użytkownika, a kody operacji pobierane są z pamięci.
+
+** Wyświetlanie wyników
+Wyniki są wyświetlane w systemie binarnym na diodach znajdujących się na płytce.
+
+* Testbench
+Testbench został napisany w celu szybszego oraz łatwiejszego sprawdzania poprawności obliczeń wykonywanych przed prosty µP. 
+W pierwszej fazie badane było zachowanie wyjść w momencie gdy na wejścia podawane były dane i kody operacji z pamięci (select_input = 1'b1).
+W drugiej fazie kody operacji pobierane były z pamięci, a dane podawane przez "użytkownika" (select_input = 1'b0).
