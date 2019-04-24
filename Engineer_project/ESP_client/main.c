@@ -35,8 +35,8 @@
 // ESP8266
 uint8_t esp_config_flag = 1;  // Does ESP module need to be configured
 uint8_t config_state = 0;     // Whan part of configuration is now needed
-uint16_t error_cnt = 0;	      // Indicate that OK didn't occure after command
-uint8_t first_cmd = 1;	      // Command needs to be send to ESP just once
+uint16_t error_cnt = 0;       // Indicate that OK didn't occure after command
+uint8_t first_cmd = 1;        // Command needs to be send to ESP just once
 uint8_t prepare_to_send = 1;
 
 // DS18B20
@@ -79,22 +79,22 @@ int main (){
   //=========================================================================
   sensor_number = search_sensors();  // Check the number of the sensors
 
-  DS18X20_start_meas(DS18X20_POWER_EXTERN, NULL);  //Start measurment for all
-                                                   //sensors, NULL - sensor's
-                                                   //id in the rom-code
+  DS18X20_start_meas(DS18X20_POWER_EXTERN, NULL); //Start measurment for all
+                                                  //sensors, NULL - sensor's
+                                                  //id in the rom-code
   _delay_ms(750);  //Temp conversion time for 12-bit resolution
 
   // Read temperature of the 1st sensor
   if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[0], &temp_sign[0],
-				      &temp_total[0], &temp_frac[0]));
+                                      &temp_total[0], &temp_frac[0]));
   else PORTD |= (1 << PD7);
   // Read temperature of the 1st sensor
   if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[1], &temp_sign[1],
-				      &temp_total[1], &temp_frac[1]));
+                                      &temp_total[1], &temp_frac[1]));
   else PORTD |= (1 << PD7);
   // Read temperature of the 1st sensor
   if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[2], &temp_sign[2],
-				      &temp_total[2], &temp_frac[2]));
+                                      &temp_total[2], &temp_frac[2]));
   else PORTD |= (1 << PD7);
 
   
@@ -106,73 +106,73 @@ int main (){
     if (esp_config_flag){ // Flag that is set when ESP is not already
                           //   configured
       switch (config_state){
-    	// Test ESP connection
+        // Test ESP connection
       case ESP_TEST:
-    	if (first_cmd){
-    	  uart_puts("AT\r\n");
-    	  first_cmd = 0;
-    	}
-	
-    	if (ok_check_f()){
-    	  error_cnt = 0;
-    	  first_cmd = 1;
-    	  uart_clear();
-    	  config_state = AP_CONNECT;
-    	}
-    	else error_cnt++;
+        if (first_cmd){
+          uart_puts("AT\r\n");
+          first_cmd = 0;
+        }
+  
+        if (ok_check_f()){
+          error_cnt = 0;
+          first_cmd = 1;
+          uart_clear();
+          config_state = AP_CONNECT;
+        }
+        else error_cnt++;
        
-    	if (error_cnt >= 40){
-    	  first_cmd = 1;
-    	  error_cnt = 0;
-    	}
+        if (error_cnt >= 40){
+          first_cmd = 1;
+          error_cnt = 0;
+        }
        
-    	_delay_us(500);
-    	break;
+        _delay_us(500);
+        break;
        
-    	// Connect to AP
+        // Connect to AP
       case AP_CONNECT:
-    	if (first_cmd){
-    	  uart_puts("AT+CWJAP=\"ESP8266\",\"1234\"\r\n");
-    	  first_cmd = 0;
-    	}
-	
-    	if (ok_check_f()){
-    	  error_cnt = 0;
-    	  first_cmd = 1;
-    	  config_state = TCP_CONNECTION;
-    	  uart_clear();
-    	}
-    	else error_cnt++;
+        if (first_cmd){
+          uart_puts("AT+CWJAP=\"ESP8266\",\"1234\"\r\n");
+          first_cmd = 0;
+        }
+  
+        if (ok_check_f()){
+          error_cnt = 0;
+          first_cmd = 1;
+          config_state = TCP_CONNECTION;
+          uart_clear();
+        }
+        else error_cnt++;
        
-    	if (error_cnt >= 5000){
-    	  first_cmd = 1;
-    	  error_cnt = 0;
-    	}
+        if (error_cnt >= 5000){
+          first_cmd = 1;
+          error_cnt = 0;
+        }
        
-    	_delay_ms(1);
-    	break;
+        _delay_ms(1);
+        break;
 
-	// Establish TCP connection and start connection
+        // Establish TCP connection and start connection
       case TCP_CONNECTION:
-    	if (first_cmd){
-    	  uart_puts("AT+CIPSTART=\"TCP\",\"192.168.0.101\",80\r\n");
-    	  first_cmd = 0;
-    	}
-	
-    	if (ok_check_f()){
-    	  error_cnt = 0;
-    	  esp_config_flag = 0;
-    	  uart_clear();
-    	}
-    	else error_cnt++;
+        if (first_cmd){
+          uart_puts("AT+CIPSTART=\"TCP\",\"192.168.0.101\",80\r\n");
+          first_cmd = 0;
+        }
+  
+        if (ok_check_f()){
+          error_cnt = 0;
+          esp_config_flag = 0;
+          uart_clear();
+        }
+        else error_cnt++;
        
-    	if (error_cnt >= 200){
-    	  first_cmd = 1;
-    	  error_cnt = 0;
-    	}
+        if (error_cnt >= 200){
+          first_cmd = 1;
+          error_cnt = 0;
+        }
        
-    	_delay_ms(1);
-    	break;
+        _delay_ms(1);
+        break;
       }
     }
     
@@ -181,91 +181,91 @@ int main (){
     //=========================================================================
     else{
       /* for (uint8_t i = 0; i < 10; i++){ */
-      /* 	if (prepare_to_send == 1){ */
-      /* 	  uart_puts("AT+CIPSEND=1\r\n"); */
-      /* 	  _delay_ms(4); */
-      /* 	  uart_clear(); */
-      /* 	  uart_putint(i); */
-      /* 	  uart_puts("\r\n"); */
-      /* 	} */
-      /* 	if (ok_check_f()){ */
-      /* 	  prepare_to_send = 1; */
-      /* 	  i++; */
-      /* 	} */
-      /* 	_delay_ms(1000); */
-      /* 	uart_clear(); */
+      /*  if (prepare_to_send == 1){ */
+      /*    uart_puts("AT+CIPSEND=1\r\n"); */
+      /*    _delay_ms(4); */
+      /*    uart_clear(); */
+      /*    uart_putint(i); */
+      /*    uart_puts("\r\n"); */
+      /*  } */
+      /*  if (ok_check_f()){ */
+      /*    prepare_to_send = 1; */
+      /*    i++; */
+      /*  } */
+      /*  _delay_ms(1000); */
+      /*  uart_clear(); */
       /* } */
       /* uart_puts("AT+CIPCLOSE\r\n"); */
 
       if (s1_flag){
-	// Make the actions when 1 second get passed
-	// Check the number of sensors on the bus
-      	if ((seconds&5) == 0) sensor_number = search_sensors();
-	// Send an order to DS18B20 to start a measure
-      	if ((seconds%5) == 1) DS18X20_start_meas(DS18X20_POWER_EXTERN, NULL);
-	// Read temperature form the 1st sensor and send the result to the
-	//   master via WiFi
-      	if (((seconds%5) == 2)){
-	  if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[0], &temp_sign[0],
-					      &temp_total[0], &temp_frac[0])){
-	    uart_puts("AT+CIPSEND=12\r\n");
-	    _delay_ms(4);
-	    uart_clear();
-	    uart_puts("T0: ");
-	    uart_putc('1');
-	    uart_putint(temp_total[0]);
-	    uart_putc(',');
-	    uart_putint(temp_frac[0]);
-	    uart_putc('C');
-	    uart_puts("\r\n");
-	    _delay_ms(10);
-	    uart_clear();
-	  }
-	  else PORTD |= (1 << PD7);
-	}
-	// Read temperature form the 2nd sensor and send the result to the
-	//   master via WiFi
-	if ((seconds%5) == 3){
-	  //_delay_ms(50);
-	  if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[1], &temp_sign[1],
-					      &temp_total[1], &temp_frac[1])){
-	    uart_puts("AT+CIPSEND=12\r\n");
-	    _delay_ms(4);
-	    uart_clear();
-	    uart_puts("T1: ");
-	    uart_putc('1');
-	    uart_putint(temp_total[1]);
-	    uart_putc(',');
-	    uart_putint(temp_frac[1]);
-	    uart_putc('C');
-	    uart_puts("\r\n");
-	    _delay_ms(10);
-	    uart_clear();
-	  }
-	  else PORTD |= (1 << PD7);
-	}
-	// Read temperature form the 3rd sensor and send the result to the
-	//   master via WiFi
-	if ((seconds%5) == 4){
-	  //_delay_ms(50);
-	  if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[2], &temp_sign[2],
-					      &temp_total[2], &temp_frac[2])){
-	    uart_puts("AT+CIPSEND=12\r\n");
-	    _delay_ms(4);
-	    uart_clear();
-	    uart_puts("T2: ");
-	    uart_putc('1');
-	    uart_putint(temp_total[2]);
-	    uart_putc(',');
-	    uart_putint(temp_frac[2]);
-	    uart_putc('C');
-	    uart_puts("\r\n");
-	    _delay_ms(10);
-	    uart_clear();
-	  }
-	  else PORTD |= (1 << PD7);
-	}
-      	s1_flag = 0;
+        // Make the actions when 1 second get passed
+        // Check the number of sensors on the bus
+        if ((seconds&5) == 0) sensor_number = search_sensors();
+        // Send an order to DS18B20 to start a measure
+        if ((seconds%5) == 1) DS18X20_start_meas(DS18X20_POWER_EXTERN, NULL);
+        // Read temperature form the 1st sensor and send the result to the
+        //   master via WiFi
+        if (((seconds%5) == 2)){
+          if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[0], &temp_sign[0],
+                                              &temp_total[0], &temp_frac[0])){
+            uart_puts("AT+CIPSEND=12\r\n");
+            _delay_ms(4);
+            uart_clear();
+            uart_puts("T0: ");
+            uart_putc('1');
+            uart_putint(temp_total[0]);
+            uart_putc(',');
+            uart_putint(temp_frac[0]);
+            uart_putc('C');
+            uart_puts("\r\n");
+            _delay_ms(10);
+            uart_clear();
+          }
+          else PORTD |= (1 << PD7);
+        }
+        // Read temperature form the 2nd sensor and send the result to the
+        //   master via WiFi
+        if ((seconds%5) == 3){
+          //_delay_ms(50);
+          if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[1], &temp_sign[1],
+                                              &temp_total[1], &temp_frac[1])){
+            uart_puts("AT+CIPSEND=12\r\n");
+            _delay_ms(4);
+            uart_clear();
+            uart_puts("T1: ");
+            uart_putc('1');
+            uart_putint(temp_total[1]);
+            uart_putc(',');
+            uart_putint(temp_frac[1]);
+            uart_putc('C');
+            uart_puts("\r\n");
+            _delay_ms(10);
+            uart_clear();
+          }
+          else PORTD |= (1 << PD7);
+        }
+        // Read temperature form the 3rd sensor and send the result to the
+        //   master via WiFi
+        if ((seconds%5) == 4){
+          //_delay_ms(50);
+          if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[2], &temp_sign[2],
+                                              &temp_total[2], &temp_frac[2])){
+            uart_puts("AT+CIPSEND=12\r\n");
+            _delay_ms(4);
+            uart_clear();
+            uart_puts("T2: ");
+            uart_putc('1');
+            uart_putint(temp_total[2]);
+            uart_putc(',');
+            uart_putint(temp_frac[2]);
+            uart_putc('C');
+            uart_puts("\r\n");
+            _delay_ms(10);
+            uart_clear();
+          }
+          else PORTD |= (1 << PD7);
+        }
+        s1_flag = 0;
       }
     }
     

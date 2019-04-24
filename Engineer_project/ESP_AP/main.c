@@ -79,200 +79,200 @@ int main (){
     if (esp_config_flag){
       switch (config_state){
 
-	// Test ESP connection
+        // Test ESP connection
       case ESP_TEST:
-	if (first_cmd){
-	  esp_send_cmd("AT");  // Send command to ESP
-	  usart1_cursor_positioning(1,1);
-	  uart1_puts("AT check");  // Send string to console
-	  first_cmd = 0;  // Clear flag, command to ESP won't be send again
-	}
+        if (first_cmd){
+          esp_send_cmd("AT");     // Send command to ESP
+          usart1_cursor_positioning(1,1);
+          uart1_puts("AT check"); // Send string to console
+          first_cmd = 0;          // Clear flag, command to ESP won't be send again
+        }
 
-	ok_flag = ok_check_f();  // ok_flag == 1 if ESP send 'OK'
-	if (ok_flag){
-	  usart1_cursor_positioning(2,1);
-	  uart1_puts("ESP_TEST OK!");  // Send string to console
-	  error_cnt = 0;  // Clear error counter
-	  first_cmd = 1;  // Set flag to allow sending command to ESP
-	  config_state = AP_CONNECT;
-	}
-	else error_cnt++;  // If ESP did't send response increase error couner
+        ok_flag = ok_check_f(); // ok_flag == 1 if ESP send 'OK'
+        if (ok_flag){
+          usart1_cursor_positioning(2,1);
+          uart1_puts("ESP_TEST OK!"); // Send string to console
+          error_cnt = 0;              // Clear error counter
+          first_cmd = 1;              // Set flag to allow sending command to ESP
+          config_state = AP_CONNECT;
+        }
+        else error_cnt++; // If ESP did't send response increase error couner
 
-	if (error_cnt >= 40){
-	  usart1_cursor_positioning(2,1);
-	  uart1_puts("ESP_TEST ERROR!");
-	  first_cmd = 1;  // If error counter is greater than 40 send the command again
-	  error_cnt = 0;
-	}
+        if (error_cnt >= 40){
+          usart1_cursor_positioning(2,1);
+          uart1_puts("ESP_TEST ERROR!");
+          first_cmd = 1; // If error counter is greater than 40 send the command again
+          error_cnt = 0;
+        }
 
-	_delay_ms(1);
-	break;
+        _delay_ms(1);
+        break;
 
-	// Connect to AP
+        // Connect to AP
       case AP_CONNECT:
-	if (first_cmd){
-	  esp_send_cmd("AT+CWJAP=\"SSID\",\"PWD\"");
-	  usart1_cursor_positioning(3,1);
-	  uart1_puts("AT+CWJAP check");
-	  first_cmd = 0;
-	}
-
-	ok_flag = ok_check_f();
-	if (ok_flag){
-	  usart1_cursor_positioning(4,1);
-	  uart1_puts("AP_CONNECT OK!");
-	  error_cnt = 0;
-	  first_cmd = 1;
-	  config_state = ESP_SSID_SET;
-	}
-	else error_cnt++;
-
-	if (error_cnt >= 5000){
-	  usart1_cursor_positioning(4,1);
-	  uart1_puts("AP_CONNECT ERROR!");
-	  first_cmd = 1;
-	  error_cnt = 0;
-	}
-
-	_delay_ms(1);
-	break;
-	
-	// ----- Configure as an Access Point -----
-	// Set a SSID, PWD, channel id, enc, max count of stations, <hidden ssid>
-      case ESP_SSID_SET:
-	if (first_cmd){
-	  esp_send_cmd("AT+CWSAP=\"ESP8266\",\"1234\",3,0");
-	  usart1_cursor_positioning(5,1);
-	  uart1_puts("AT+CWSAP check");
-	  first_cmd = 0;
-	}
-	
-	ok_flag = ok_check_f();
-	if (ok_flag){
-	  usart1_cursor_positioning(6,1);
-	  uart1_puts("ESP_SSID_SET OK!");
-	  error_cnt = 0;
-	  first_cmd = 1;
-	  config_state = ESP_IP_ADDRESS; 
-	}
-	else error_cnt++;
-	// Set  IP address of ESP softAP
-      case ESP_IP_ADDRESS:
-	if (first_cmd){
-	  esp_send_cmd("AT+CIPAP=\"192.168.0.101\"");
-	  usart1_cursor_positioning(7,1);
-	  uart1_puts("AT+CIPAP check");
-	  first_cmd = 0;
-	}
-
-	ok_flag = ok_check_f();
-	if(ok_flag){
-	  usart1_cursor_positioning(8,1);
-	  uart1_puts("ESP_IP_ADDRESS OK!");
-	  error_cnt = 0;
-	  first_cmd = 1;
-	  config_state = DHCP_MODE;
-	}
-	else error_cnt++;
-
-	if (error_cnt >= 40){
-	  usart1_cursor_positioning(8,1);
-	  uart1_puts("ESP_IP_ADDRESS ERROR!");
-	  first_cmd = 1;
-	  error_cnt = 0;
-	}
-
-	_delay_ms(1);
-	break;
-	
-	// Enable DHCP
-      case DHCP_MODE:
-	if (first_cmd){
-	  esp_send_cmd("AT+CWDHCP=0,1");
-	  usart1_cursor_positioning(9,1);
-	  uart1_puts("AT+CWDHCP check");
-	  first_cmd = 0;
-	}
-
-	ok_flag = ok_check_f();
-	if (ok_flag){
-	  usart1_cursor_positioning(10,1);
-	  uart1_puts("DHCP_MODE OK!");
-	  error_cnt = 0;
-	  first_cmd = 1;
-	  config_state = MUX_CONNECTION;
-	}
-	else error_cnt++;
-
-	if(error_cnt >= 40){
-	  usart1_cursor_positioning(10,1);
-	  uart1_puts("DHCP_MODE ERROR!");
-	  first_cmd = 1;
-	  error_cnt = 0;
-	}
-
-	_delay_ms(1);
-	break;
-
-	// Enable multiple connections
-      case MUX_CONNECTION:
-	if (first_cmd){
-	  esp_send_cmd("AT+CIPMUX=1");
-	  usart1_cursor_positioning(11,1);
-	  uart1_puts("AT+CIPMUX check");
-	  first_cmd = 0;
-	}
-
-	ok_flag = ok_check_f();
-	if (ok_flag){
-	  usart1_cursor_positioning(12,1);
-	  uart1_puts("MUX_CONNECT OK!");
-	  error_cnt = 0;
-	  first_cmd = 1;
-	  config_state = SERVER_START;
-	}
-	else error_cnt++;
-
-	if (error_cnt >= 40){
-	  usart1_cursor_positioning(12,1);
-	  uart1_puts("MUX_CONNECT ERROR!");
-	  first_cmd = 1;
-	  error_cnt = 0;
-	}
-
-	_delay_ms(1);
-	break;
-	
-	// Configure as server
-      case SERVER_START:
-	if (first_cmd){
-	  esp_send_cmd("AT+CIPSERVER=1,80");
-	  usart1_cursor_positioning(13,1);
-	  uart1_puts("AT+CIPSERVER check");
+        if (first_cmd){
+          esp_send_cmd("AT+CWJAP=\"SSID\",\"PWD\"");
+          usart1_cursor_positioning(3,1);
+          uart1_puts("AT+CWJAP check");
           first_cmd = 0;
-	}
+        }
 
-	ok_flag = ok_check_f();
-	if (ok_flag){
-	  usart1_cursor_positioning(14,1);
-	  uart1_puts("SERVER_START OK!");
-	  error_cnt = 0;
-	  esp_config_flag = 0;
-	  uart1_puts("\r\nConfiguration finished\r\n");
-	  _delay_ms(1000);
-	  usart1_erase_screen();
-	}
-	else error_cnt++;
+        ok_flag = ok_check_f();
+        if (ok_flag){
+          usart1_cursor_positioning(4,1);
+          uart1_puts("AP_CONNECT OK!");
+          error_cnt = 0;
+          first_cmd = 1;
+          config_state = ESP_SSID_SET;
+        }
+        else error_cnt++;
 
-	if (error_cnt >= 40){
-	  usart1_cursor_positioning(14,1);
-	  uart1_puts("SERVER_START ERROR!");
-	  first_cmd = 1;
-	  error_cnt = 0;
-	}
+        if (error_cnt >= 5000){
+          usart1_cursor_positioning(4,1);
+          uart1_puts("AP_CONNECT ERROR!");
+          first_cmd = 1;
+          error_cnt = 0;
+        }
 
-	_delay_ms(1);
-	break;
+        _delay_ms(1);
+        break;
+  
+        // ----- Configure as an Access Point -----
+        // Set a SSID, PWD, channel id, enc, max count of stations, <hidden ssid>
+      case ESP_SSID_SET:
+        if (first_cmd){
+          esp_send_cmd("AT+CWSAP=\"ESP8266\",\"1234\",3,0");
+          usart1_cursor_positioning(5,1);
+          uart1_puts("AT+CWSAP check");
+          first_cmd = 0;
+        }
+  
+        ok_flag = ok_check_f();
+        if (ok_flag){
+          usart1_cursor_positioning(6,1);
+          uart1_puts("ESP_SSID_SET OK!");
+          error_cnt = 0;
+          first_cmd = 1;
+          config_state = ESP_IP_ADDRESS; 
+        }
+        else error_cnt++;
+        // Set  IP address of ESP softAP
+      case ESP_IP_ADDRESS:
+        if (first_cmd){
+          esp_send_cmd("AT+CIPAP=\"192.168.0.101\"");
+          usart1_cursor_positioning(7,1);
+          uart1_puts("AT+CIPAP check");
+          first_cmd = 0;
+        }
+
+        ok_flag = ok_check_f();
+        if(ok_flag){
+          usart1_cursor_positioning(8,1);
+          uart1_puts("ESP_IP_ADDRESS OK!");
+          error_cnt = 0;
+          first_cmd = 1;
+          config_state = DHCP_MODE;
+        }
+        else error_cnt++;
+
+        if (error_cnt >= 40){
+          usart1_cursor_positioning(8,1);
+          uart1_puts("ESP_IP_ADDRESS ERROR!");
+          first_cmd = 1;
+          error_cnt = 0;
+        }
+
+        _delay_ms(1);
+        break;
+  
+        // Enable DHCP
+      case DHCP_MODE:
+        if (first_cmd){
+          esp_send_cmd("AT+CWDHCP=0,1");
+          usart1_cursor_positioning(9,1);
+          uart1_puts("AT+CWDHCP check");
+          first_cmd = 0;
+        }
+
+        ok_flag = ok_check_f();
+        if (ok_flag){
+          usart1_cursor_positioning(10,1);
+          uart1_puts("DHCP_MODE OK!");
+          error_cnt = 0;
+          first_cmd = 1;
+          config_state = MUX_CONNECTION;
+        }
+        else error_cnt++;
+
+        if(error_cnt >= 40){
+          usart1_cursor_positioning(10,1);
+          uart1_puts("DHCP_MODE ERROR!");
+          first_cmd = 1;
+          error_cnt = 0;
+        }
+
+        _delay_ms(1);
+        break;
+
+        // Enable multiple connections
+      case MUX_CONNECTION:
+        if (first_cmd){
+          esp_send_cmd("AT+CIPMUX=1");
+          usart1_cursor_positioning(11,1);
+          uart1_puts("AT+CIPMUX check");
+          first_cmd = 0;
+        }
+
+        ok_flag = ok_check_f();
+        if (ok_flag){
+          usart1_cursor_positioning(12,1);
+          uart1_puts("MUX_CONNECT OK!");
+          error_cnt = 0;
+          first_cmd = 1;
+          config_state = SERVER_START;
+        }
+        else error_cnt++;
+
+        if (error_cnt >= 40){
+          usart1_cursor_positioning(12,1);
+          uart1_puts("MUX_CONNECT ERROR!");
+          first_cmd = 1;
+          error_cnt = 0;
+        }
+
+        _delay_ms(1);
+        break;
+  
+        // Configure as server
+      case SERVER_START:
+        if (first_cmd){
+          esp_send_cmd("AT+CIPSERVER=1,80");
+          usart1_cursor_positioning(13,1);
+          uart1_puts("AT+CIPSERVER check");
+          first_cmd = 0;
+        }
+
+        ok_flag = ok_check_f();
+        if (ok_flag){
+          usart1_cursor_positioning(14,1);
+          uart1_puts("SERVER_START OK!");
+          error_cnt = 0;
+          esp_config_flag = 0;
+          uart1_puts("\r\nConfiguration finished\r\n");
+          _delay_ms(1000);
+          usart1_erase_screen();
+        }
+        else error_cnt++;
+
+        if (error_cnt >= 40){
+          usart1_cursor_positioning(14,1);
+          uart1_puts("SERVER_START ERROR!");
+          first_cmd = 1;
+          error_cnt = 0;
+        }
+
+        _delay_ms(1);
+        break;
       }
     }
     else{
@@ -282,37 +282,37 @@ int main (){
       // Search for 'C'. If found stop saving data to string and
       //   display received temperatures
       if (char_buffer == 'C') {
-	record_begin = 0;
-	// Send data to console, properly set
-	if (received_string[1] == '0'){
-	  if (received_string[4] == '0') usart1_cursor_positioning(4,4);
-	  else if (received_string[4] == '1') usart1_cursor_positioning(4,16);
-	}
-	else if (received_string[1] == '1'){
-	  if (received_string[4] == '0') usart1_cursor_positioning(8,4);
-	  else if (received_string[4] == '1') usart1_cursor_positioning(8,16);
-	}
-	else if (received_string[1] == '2'){
-	  if (received_string[4] == '0') usart1_cursor_positioning(12,4);
-	  else if (received_string[4] == '1') usart1_cursor_positioning(12,16);
-	}
-	else usart1_cursor_positioning(4,4);
-	
-	for (uint8_t i = 0; i < 4; i++){
-	  data_to_send[i] = received_string[i+5];
-	}
-	uart1_puts(data_to_send);
-	string_control = 0;
+        record_begin = 0;
+        // Send data to console, properly set
+        if (received_string[1] == '0'){
+          if (received_string[4] == '0') usart1_cursor_positioning(4,4);
+          else if (received_string[4] == '1') usart1_cursor_positioning(4,16);
+        }
+        else if (received_string[1] == '1'){
+          if (received_string[4] == '0') usart1_cursor_positioning(8,4);
+          else if (received_string[4] == '1') usart1_cursor_positioning(8,16);
+        }
+        else if (received_string[1] == '2'){
+          if (received_string[4] == '0') usart1_cursor_positioning(12,4);
+          else if (received_string[4] == '1') usart1_cursor_positioning(12,16);
+        }
+        else usart1_cursor_positioning(4,4);
+  
+        for (uint8_t i = 0; i < 4; i++){
+          data_to_send[i] = received_string[i+5];
+        }
+        uart1_puts(data_to_send);
+        string_control = 0;
       }
       if (record_begin){
-	if (char_buffer != received_string[string_control])
-	  received_string[string_control++] = char_buffer;
+        if (char_buffer != received_string[string_control])
+          received_string[string_control++] = char_buffer;
       }
 
       // If it was no data send to console before, clear console
       if (first){
-	usart1_erase_screen();
-	first = 0;
+        usart1_erase_screen();
+        first = 0;
       }
     }
   }
@@ -324,9 +324,9 @@ int main (){
 //=========================================================================
 //-------------------------------------------------------------------------
 void esp_send_cmd(char command[]) {
-  strcat(command, "\r\n");  // Concatenation of the command and ENTER
-                            //  to send command to ESP 
-  uart0_puts(command);  // Send command to esp
+  strcat(command, "\r\n"); // Concatenation of the command and ENTER
+                           //  to send command to ESP 
+  uart0_puts(command);     // Send command to esp
 }
 
 //-------------------------------------------------------------------------
